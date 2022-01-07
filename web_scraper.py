@@ -3,7 +3,6 @@ from email.message import EmailMessage
 import smtplib
 from openpyxl import Workbook
 from bs4 import BeautifulSoup
-from segredo import EMAIL_ADRESS, EMAIL_PASSWORD
 
 enviar_email = True
 

@@ -1,5 +1,6 @@
 from web_scraper import start_scrape
 from urllib.request import urlopen, Request
+from cryptography.fernet import Fernet
 
 def main():
 
@@ -7,11 +8,20 @@ def main():
     certain = 'N'
     login = ""
     password = ""
+    saveLogin = 'N'
     subject = ""
     content = ""
     emailCurrent = ""
     emails = []
     webpage = ""
+    try:
+        with open('key.txt', 'rb') as f:
+            key = f.readline()
+    except FileNotFoundError:
+        with open('key.txt', 'wb') as f:
+            key = Fernet.generate_key()
+            f.write(key)
+    fernet = Fernet(key)
 
     print("Bem vinda(o) ao nosso sistema! Digite o número da opção desejada e tecle enter.")
 
@@ -31,8 +41,22 @@ def main():
         else:
             print("Comando não reconhecido.")
     
-    login = input("Digite o e-mail remetente: ")
-    password = input("Digite a senha do e-mail remetente: ")
+    try:
+        with open('segredo.txt', 'rb') as f:
+            lines = f.readlines()
+            login = fernet.decrypt(lines[0]).decode()
+            password = fernet.decrypt(lines[1]).decode()
+    except FileNotFoundError:
+        login = input("Digite o e-mail remetente: ")
+        password = input("Digite a senha do e-mail remetente: ")
+        saveLogin = input("Deseja salvar as informações de login? (S/N): ")
+        if (saveLogin == 's' or saveLogin == 'S'):
+            with open('segredo.txt', 'wb') as f:
+                f.write(fernet.encrypt(login.encode()))
+                line = "\n"
+                f.write(line.encode('utf-8'))
+                f.write(fernet.encrypt(password.encode()))
+
     subject = input("Digite o assunto dos e-mails: ")
     content = input("Digite o conteúdo dos e-mails:\n")
 
