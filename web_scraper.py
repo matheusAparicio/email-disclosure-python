@@ -11,11 +11,14 @@ sheet = book.active
 
 
 def start_scrape(subject:str, content:str, login:str, password='', emailsManual=[], page=''):
-    
-    scrape = BeautifulSoup(page, 'html.parser')
-    scrape = scrape.get_text()
-  
-    emails = set(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape))
+    emails = []
+    try:
+      scrape = BeautifulSoup(page, 'html.parser')
+      scrape = scrape.get_text()
+      emails = set(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape))
+    except:
+      print("Não foi possível obter os e-mails do link fornecido.")
+
     email_list = list(emails)
     for item in emailsManual:
         email_list.insert(0, item)

@@ -1,10 +1,14 @@
 from web_scraper import start_scrape
 from urllib.request import urlopen, Request
 from cryptography.fernet import Fernet
+from getBoolByString import getBoolByString
+from getStringByBool import getStringByBool
 
 def main():
 
-    command = 0
+    commandManual = False
+    commandWebScraping = False
+    commandFileScraping = False
     certain = 'N'
     login = ""
     password = ""
@@ -23,23 +27,22 @@ def main():
             f.write(key)
     fernet = Fernet(key)
 
-    print("Bem vinda(o) ao nosso sistema! Digite o número da opção desejada e tecle enter.")
+    print("Bem vinda(o) ao nosso sistema! Digite o número da opção desejada e tecle enter.\n\n")
 
-    while(command != 1 and command != 2 and command != 3 or (certain != 'S' and certain != 's')):
-        command = int(input("""
-    1: Você digita manualmente os e-mails para o qual quer enviar mensagens.
-    2: Você digita um site onde será feito webscrapping para obter os e-mails do qual serão enviadas as mensagens.
-    3: Você adiciona e-mails manualmente e indica um site para mais e-mails a serem obtidos.
-    Comando: """))
+    while(certain != 'S' and certain != 's'):
+        
+        print("Digite 's' para sim e 'n' para não nas seguintes perguntas. (Uma não anula a outra.)")
+    
+        commandManual = getBoolByString(input("Você digitará manualmente os e-mails para o qual enviará mensagens?: "))
+        commandWebScraping = getBoolByString(input("Você irá adquirir e-mails de algum site através de webscraping?: "))
+        commandFileScraping = getBoolByString(input("Você irá adquirir e-mails de algum arquivo através de webscraping?: "))
 
-        if (command == 1):
-            certain = input("Você escolheu a opção 1: Adicionar e-mails manualmente.\nTem certeza? (S/N): ")
-        elif (command == 2):
-            certain = input("Você escolheu a opção 2: Adicionar e-mails automaticamente.\nTem certeza? (S/N): ")
-        elif (command == 3):
-            certain = input("Você escolheu a opção 3: Adicionar e-mails manualmente e automaticamente.\nTem certeza? (S/N): ")
-        else:
-            print("Comando não reconhecido.")
+        print(f"""
+Digitar e-mails manualmente: {getStringByBool(commandManual)}
+Digitar site para webscraping de e-mails: {getStringByBool(commandWebScraping)}
+Digitar caminho de arquivo para scraping de e-mails: {getStringByBool(commandFileScraping)}""")
+
+        certain = input("Você tem certeza de suas escolhas?: ")
     
     try:
         with open('segredo.txt', 'rb') as f:
@@ -60,28 +63,21 @@ def main():
     subject = input("Digite o assunto dos e-mails: ")
     content = input("Digite o conteúdo dos e-mails:\n")
 
-    if (command == 1 or command == 3):
-        emailCurrent = input("Digite o e-mail 1: ")
-        emails.append(emailCurrent)
-        while (emailCurrent != ""):
+    if (commandManual):
+        while (emailCurrent != "" or len(emails) == 0):
             emailCurrent = input(f"Digite o e-mail {len(emails)+1}: ")
             if emailCurrent != "":
                 emails.append(emailCurrent)
 
-    if (command == 2 or command == 3):
+    if (commandWebScraping):
         webpage = input("Cole o link para fazer webscraping de emails: ")
 
     try:
-        if command == 1:
-            start_scrape(subject, content, login, password, emailsManual=emails)
-        elif command == 2:
+        if (webpage != ""):
             page = urlopen(webpage)
-            start_scrape(subject, content, login, password, page=page)
-        else:
-            page = urlopen(webpage)
-            start_scrape(subject, content, login, password, emailsManual=emails, page=page)
+        start_scrape(subject, content, login, password, emailsManual=emails, page=page)
     except:
-        if command != 1:
+        if commandWebScraping:
             hdr = {'User-Agent': 'Mozilla/5.0'}
             req = Request(webpage, headers=hdr)
             page = urlopen(req)
