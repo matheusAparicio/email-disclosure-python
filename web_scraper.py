@@ -19,6 +19,12 @@ def start_scrape(subject:str, content:str, login:str, password='', emailsManual=
     except:
       print("Não foi possível obter os e-mails do link fornecido.")
 
+    contentSignature = content + """\n
+Este é um e-mail automático, favor não responder.    
+Bot para envio de e-mails criado por Matheus e Arthur.
+github.com/matheusAparicio
+github.com/ArthurErn"""
+
     email_list = list(emails)
     for item in emailsManual:
         email_list.insert(0, item)
@@ -29,7 +35,7 @@ def start_scrape(subject:str, content:str, login:str, password='', emailsManual=
             sheet.append(row)
             msg = EmailMessage()
             msg['Subject'] = subject
-            msg.set_content(content)
+            msg.set_content(contentSignature)
             msg['From'] = login
             msg['To'] = row[0]
             print(row[0])
