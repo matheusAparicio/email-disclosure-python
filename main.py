@@ -18,6 +18,7 @@ def main():
     emailCurrent = ""
     emails = []
     webpage = ""
+    page = ""
     try:
         with open('key.txt', 'rb') as f:
             key = f.readline()
@@ -73,16 +74,16 @@ Digitar caminho de arquivo para scraping de e-mails: {getStringByBool(commandFil
         webpage = input("Cole o link para fazer webscraping de emails: ")
 
     try:
-        if (webpage != ""):
+        if commandWebScraping:
             page = urlopen(webpage)
         start_scrape(subject, content, login, password, emailsManual=emails, page=page)
-    except:
+    except Exception as e:
         if commandWebScraping:
             hdr = {'User-Agent': 'Mozilla/5.0'}
             req = Request(webpage, headers=hdr)
             page = urlopen(req)
             start_scrape(subject, content, login, password, emailsManual=emails, page=page)
-        print("caiu no except")
+        print(f"caiu no except: {e}")
 
 if __name__ == "__main__":
     main()
